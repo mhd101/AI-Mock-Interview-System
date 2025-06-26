@@ -1,4 +1,5 @@
 import {Routes, Route, Navigate} from 'react-router-dom'
+import NotFound from './pages/NotFound'
 
 const App = () => {
   return (
@@ -8,7 +9,7 @@ const App = () => {
     <Route path='/register' element={<h1>Register Page</h1>} />
     <Route path='/login' element={<h1>Login Page</h1>} />
     
-    <Route path='*' element={<Navigate  to='/' />} />
+    <Route path='*' element={<NotFound />} />
     
    </Routes>
    </>
