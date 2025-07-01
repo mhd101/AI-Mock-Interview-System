@@ -1,6 +1,8 @@
 import { FaArrowRightLong } from "react-icons/fa6";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const Hero = () => {
+    const navigate = useNavigate();
     return (
         <>
             <div className="flex flex-col items-center justify-center gap-3 max-w-[1024px] h-screen mx-auto mt-[-96px] text-center">
@@ -10,9 +12,8 @@ const Hero = () => {
                 <div className="w-sm sm:w-lg md:w-2xl">
                     <p className="text-black/70 font-light text-lg sm:text-xl">Get detailed feedback and improve your interview skills with our AI-powered platform</p>
                 </div>
-                <button type="button" className="px-15 py-4 my-5 bg-black text-white text-sm rounded-4xl font-normal cursor-pointer flex items-center gap-2 hover:bg-neutral-800">Start Practicing<FaArrowRightLong />
-
-</button>
+                <button type="button" onClick={() => navigate("/login")} className="px-15 py-4 my-5 bg-black text-white text-sm rounded-4xl font-normal cursor-pointer flex items-center gap-2 hover:bg-neutral-800">Start Practicing<FaArrowRightLong />
+                </button>
             </div>
         </>
     )
