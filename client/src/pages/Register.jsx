@@ -10,9 +10,7 @@ const Register = () => {
   });
 
   const password = watch("password");
-
-  console.log(errors);
-
+  
   return (
     <>
       <Navbar text="Login" accountExist="Already have an account?" onclick={() => navigate("/login")}  />
