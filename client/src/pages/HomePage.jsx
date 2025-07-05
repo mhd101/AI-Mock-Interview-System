@@ -1,13 +1,13 @@
 import Navbar from '../components/Navbar'
-import Hero from '../components/Hero'
+import Body from '../components/Body'
 import { useNavigate } from 'react-router-dom'
 
 const HomePage = () => {
     const navigate = useNavigate();
     return (
         <>
-            <Navbar text="Register" onclick={() => navigate("/register")} accountExist="Don't have an account?" />
-            <Hero />
+            <Navbar text="Register" onclick={() => navigate("/register")} buttonMessage="Don't have an account?" />
+            <Body />
         </>
     )
 }

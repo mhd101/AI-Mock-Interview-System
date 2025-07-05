@@ -11,7 +11,7 @@ const Login = () => {
 
   return (
     <>
-      <Navbar text="Register" accountExist="Don't have an account?" onclick={() => navigate("/register")}  />
+      <Navbar text="Register" buttonMessage="Don't have an account?" onclick={() => navigate("/register")}  />
       <div className="flex flex-col items-center justify-center gap-5 max-w-[1024px] h-screen mx-auto mt-[-96px] text-center">
 
         <div className="flex flex-col justify-center item-center mt-30"> 

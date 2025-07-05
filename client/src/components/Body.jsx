@@ -1,7 +1,7 @@
 import { FaArrowRightLong } from "react-icons/fa6";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-const Hero = () => {
+const Body = () => {
     const navigate = useNavigate();
     return (
         <>
@@ -19,6 +19,6 @@ const Hero = () => {
     )
 }
 
-export default Hero
+export default Body
 
 

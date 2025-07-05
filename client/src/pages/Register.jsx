@@ -13,7 +13,7 @@ const Register = () => {
   
   return (
     <>
-      <Navbar text="Login" accountExist="Already have an account?" onclick={() => navigate("/login")}  />
+      <Navbar text="Login" buttonMessage="Already have an account?" onclick={() => navigate("/login")}  />
       <div className="flex flex-col items-center justify-center gap-5 max-w-[1024px] h-screen mx-auto mt-[-96px] text-center">
 
         <div className="flex flex-col justify-center item-center mt-30"> 
