@@ -54,7 +54,7 @@ const Navbar = (props) => {
 
                             <div className='relative inline-block' ref={dropdownRef}>
                                 <button onClick={() => setIsOpen(!isOpen)} className='flex justify-center items-center'>
-                                    <PiUserCircleFill size={30} className='cursor-pointer ' />
+                                    <PiUserCircleFill size={35} className='cursor-pointer ' />
                                 </button>
 
                                 {isOpen && (
