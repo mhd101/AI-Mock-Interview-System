@@ -41,7 +41,7 @@ const Navbar = (props) => {
                     {(!props.authenticated) &&
                         (
                             <>
-                                <p className='font-light text-sm text-black/80'>{props.buttonMessage}</p>
+                                <p className='hidden sm:flex font-light text-sm text-black/80'>{props.buttonMessage}</p>
                                 <Button text={props.text} onclick={props.onclick} />
                             </>
                         )}
@@ -49,8 +49,8 @@ const Navbar = (props) => {
                     {/* If user is authenticated */}
                     {props.authenticated &&
                         <div className='font-light text-sm text-black/80 flex flex-row items-center justify-end gap-4 '>
-                            <Link to="/my-interviews" className='hover:text-black'>My Interviews</Link>
-                            <Link to="/interview-history" className='hover:text-black'>Interview History</Link>
+                            <Link to="/my-interviews" className='hidden sm:flex hover:text-black'>My Interviews</Link>
+                            <Link to="/interview-history" className='hidden sm:flex hover:text-black'>Interview History</Link>
 
                             <div className='relative inline-block' ref={dropdownRef}>
                                 <button onClick={() => setIsOpen(!isOpen)} className='flex justify-center items-center'>
@@ -61,6 +61,8 @@ const Navbar = (props) => {
                                     <div className="absolute right-0 mt-2 w-48 bg-white outline-gray-400/50 outline-1 rounded drop-shadow-md z-50">
                                         <ul className="flex flex-col p-2 text-sm text-black/80">
                                             <Link to={"/profile-settings"} className="hover:bg-gray-100 px-4 py-2 cursor-pointer">Profile Settings</Link>
+                                            <Link to="/my-interviews" className='sm:hidden hover:bg-gray-100 px-4 py-2 cursor-pointer'>My Interviews</Link>
+                                            <Link to="/interview-history" className='sm:hidden hover:bg-gray-100 px-4 py-2 cursor-pointer'>Interview History</Link>
                                             <Link to={"/"} className="hover:bg-gray-100 px-4 py-2 cursor-pointer">Logout</Link>
                                         </ul>
                                     </div>

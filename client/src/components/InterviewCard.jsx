@@ -1,26 +1,35 @@
 import { useForm } from "react-hook-form"
+import { FaArrowRightLong } from "react-icons/fa6";
 
 const InterviewCard = () => {
 
-    const {register, handleSubmit, formState: { errors }} = useForm();
+    const { register, handleSubmit, formState: { errors } } = useForm();
     const onSubmit = (data) => {
         console.log(data)
     }
     return (
         <>
-            <div className="flex flex-col justify-around items-center max-w-[1024px] min-h-[calc(100vh-5rem)] mx-auto  text-center border-1">
-                <div className=" flex flex-col gap-4 w-xl px-15 py-10 rounded-md outline-gray-400/50 outline-1">
-                    <div className="w-full flex flex-col gap-1">
-                        <h2 className="text-2xl font-medium">Practice Technical Interview</h2>
-                        <p className="text-center font-light text-sm text-black/70">Select question category, level and no. of questions to generate interview questions and practice answering them.</p>
+            <div className="flex flex-col items-center justify-center gap-5 max-w-[600px] h-screen mx-auto mt-[-76px] text-center ">
+                <div className="flex flex-col w-full sm:hidden">
+                    <h2 className="text-xl font-semibold">Oops! You're on a small screen</h2>
+                    <p className="text-gray-600 mt-1">
+                        This app is designed for desktop use. For the best experience, please open it on a laptop or PC.
+                    </p>
+
+                </div>
+                <div className="hidden sm:flex flex-col gap-6 w-full px-15 py-20 rounded-md outline-gray-400/50 outline-1 ">
+
+                    <div className=" flex flex-col gap-2">
+                        <h2 className="text-5xl font-semibold">Practice Technical Interview</h2>
+                        <p className="text-center font-light text-md text-black/70">Select question category, level and no. of questions to generate interview questions and practice answering them.</p>
                     </div>
 
-                    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+                    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
 
-                        <div className="flex flex-col items-start gap-0.5">
+                        <div className="flex flex-col gap-1 text-left">
                             <label>Select Category:</label>
                             <p className="text-sm font-light text-black/70">Choose the programming language or technology</p>
-                            <select id="category" {...register("category", { required: "This field is required"})} className="px-2 py-2 mt-1 rounded-md outline-gray-400 font-light text-sm outline-1 w-full ">
+                            <select id="category" {...register("category", { required: "This field is required" })} className="px-2 py-2 mt-1 rounded-md outline-gray-400 font-light text-sm outline-1 w-full ">
                                 <option value="" className="font-light">--Select--</option>
                                 <option value="javascript" className="font-light">JavaScript</option>
                                 <option value="java" className="font-light">Java</option>
@@ -33,11 +42,11 @@ const InterviewCard = () => {
                             <p className="text-red-600 text-sm mt-1">{errors.category?.message}</p>
                         </div>
 
-                       
-                       <div className="flex flex-col items-start gap-0.5">
+
+                        <div className="flex flex-col items-start gap-0.5">
                             <label>Select Level:</label>
                             <p className="text-sm font-light text-black/70">Choose the difficulty level of questions</p>
-                            <select id="category" {...register("level", { required: "This field is required"})} className="px-2 py-2 mt-1 rounded-md outline-gray-400 font-light text-sm outline-1 w-full ">
+                            <select id="category" {...register("level", { required: "This field is required" })} className="px-2 py-2 mt-1 rounded-md outline-gray-400 font-light text-sm outline-1 w-full ">
                                 <option value="" className="font-light">--Select--</option>
                                 <option value="beginner" className="font-light">Beginner</option>
                                 <option value="intermediate" className="font-light">Intermediate</option>
@@ -49,7 +58,7 @@ const InterviewCard = () => {
                         <div className="flex flex-col items-start gap-0.5">
                             <label>Select Questions:</label>
                             <p className="text-sm font-light text-black/70">Choose no. of questions</p>
-                            <select id="category" {...register("questionQuantity", { required: "This field is required"})} className="px-2 py-2 mt-1 rounded-md outline-gray-400 font-light text-sm outline-1 w-full ">
+                            <select id="category" {...register("questionQuantity", { required: "This field is required" })} className="px-2 py-2 mt-1 rounded-md outline-gray-400 font-light text-sm outline-1 w-full ">
                                 <option value="" className="font-light">--Select--</option>
                                 <option value="three" className="font-light">3</option>
                                 <option value="five" className="font-light">5</option>
@@ -58,8 +67,8 @@ const InterviewCard = () => {
                             <p className="text-red-600 text-sm mt-1">{errors.questionQuantity?.message}</p>
                         </div>
 
-                        
-                        <button type="submit" className="w-full bg-black text-white px-10 py-4 rounded-md">Generate Questions</button>
+
+                        <button type="submit" className="w-full bg-black text-white px-10 py-4 rounded-md flex items-center gap-2 justify-center cursor-pointer">Generate Questions<FaArrowRightLong /></button>
                     </form>
                 </div>
             </div>
