@@ -1,12 +1,22 @@
 import { useForm } from "react-hook-form"
 import { FaArrowRightLong } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 
 const InterviewCard = () => {
-
+    const navigate = useNavigate()
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const onSubmit = (data) => {
-        console.log(data)
+    
+    const handleStartInterview = (data) => {
+        if (data){
+            console.log(data)
+
+
+
+            // used for routing and required for speech synthesis to work
+            navigate("/interview/session")
+        }
     }
+
     return (
         <>
             <div className="flex flex-col items-center justify-center gap-5 max-w-[600px] h-screen mx-auto mt-[-76px] text-center ">
@@ -24,7 +34,7 @@ const InterviewCard = () => {
                         <p className="text-center font-light text-md text-black/70">Select question category, level and no. of questions to generate interview questions and practice answering them.</p>
                     </div>
 
-                    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
+                    <form onSubmit={handleSubmit(handleStartInterview)} className="flex flex-col gap-2">
 
                         <div className="flex flex-col gap-1 text-left">
                             <label>Select Category:</label>
@@ -68,7 +78,7 @@ const InterviewCard = () => {
                         </div>
 
 
-                        <button type="submit" className="w-full bg-black text-white px-10 py-4 rounded-md flex items-center gap-2 justify-center cursor-pointer">Generate Questions<FaArrowRightLong /></button>
+                        <button type="submit" className="w-full bg-black text-white px-10 py-4 rounded-md flex items-center gap-2 justify-center cursor-pointer mt-2">Generate Questions<FaArrowRightLong /></button>
                     </form>
                 </div>
             </div>
