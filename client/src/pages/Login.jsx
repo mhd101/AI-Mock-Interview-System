@@ -1,14 +1,50 @@
 import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
 import { useForm } from 'react-hook-form'
+import axios from 'axios'
+import { useAuth } from '../authContext.jsx'
+import { useEffect } from "react"
+import { toast } from "react-toastify";
+
 
 const Login = () => {
   const navigate = useNavigate();
+  const {login, token} = useAuth(); 
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm({
+  useEffect(() => {
+    if (token) {
+      navigate('/interview');
+    }
+  }, [token, navigate]);
+
+  const { register, handleSubmit, formState: { errors } } = useForm({
     mode: "onChange"
   });
 
+  const onSubmit = async (data) => {
+    const { email, password } = data;
+    try {
+      const response = await axios.post('http://localhost:4000/api/auth/login', { email, password }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (response.status === 200) {
+        toast.success("You're now logged in");
+        const { user, token } = response.data;
+        login(user, token); // Store user and token in context
+        navigate('/interview');
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      if (error.response) {
+        toast.error(error.response.data.message || "Login failed");
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
+  }
   return (
     <>
       <Navbar text="Register" buttonMessage="Don't have an account?" onclick={() => navigate("/register")}  />
@@ -19,9 +55,7 @@ const Login = () => {
           <p className="text-3xl font-extralight">Login to your account</p>
         </div>
 
-        <form onSubmit={handleSubmit((data) => {
-          console.log(data);
-        })} className="w-sm flex flex-col gap-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="w-sm flex flex-col gap-2">
 
           {/* Email */}
           <div className="flex flex-col items-start w-full gap-0.5">

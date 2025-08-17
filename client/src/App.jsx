@@ -9,8 +9,13 @@ import MyInterviews from './pages/MyInterviews'
 import InterviewHistory from './pages/InterviewHistory'
 import ProfileSettings from './pages/ProfileSettings'
 import Profile from './pages/Profile'
+import ProtectedRoute from './ProtectedRoute'
+import { ToastContainer, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import './toast.css'
 
 const App = () => {
+
   return (
     <>
       <Routes>
@@ -18,22 +23,58 @@ const App = () => {
         <Route path='/register' element={<Register />} />
         <Route path='/login' element={<Login />} />
 
+        <Route path='/interview' element={
+          <ProtectedRoute>
+            <Interview />
+          </ProtectedRoute>} />
 
-        <Route path='/interview'>
-          <Route index element={<Interview />}/>
-        <Route path='session' element={<InterviewSession />} />
-        </Route>
+        <Route path='/interview/session' element={
+          <ProtectedRoute>
+            <InterviewSession />
+          </ProtectedRoute>} />
 
-        <Route path='/my-interviews' element={<MyInterviews />} />
-        <Route path='/interview-history' element={<InterviewHistory />} />
-        <Route path='/profile-settings' element={<ProfileSettings />} />
-        <Route path='/user-profile' element={<Profile />} />
+        <Route path='/my-interviews' element={
+          <ProtectedRoute>
+            <MyInterviews />
+          </ProtectedRoute>} />
+
+        <Route path='/interview-history' element={
+          <ProtectedRoute>
+            <InterviewHistory />
+          </ProtectedRoute>} />
 
 
+        <Route path='/profile-settings' element={
+          <ProtectedRoute>
+            <ProfileSettings />
+          </ProtectedRoute>} />
+
+        <Route path='/user-profile' element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>} />
 
         <Route path='*' element={<NotFound />} />
 
-      </Routes>
+      </Routes >
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastStyle={{ background: "white", color: "black" }}
+        iconTheme={{
+          primary: "black",
+          secondary: "white",
+        }}
+        transition={Bounce}
+      />
     </>
   )
 }

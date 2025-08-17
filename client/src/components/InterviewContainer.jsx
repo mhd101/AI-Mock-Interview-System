@@ -130,7 +130,7 @@ const InterviewContainer = () => {
 
     const handleNext = () => {
 
-        if(transcript === "") {
+        if(transcript === "" || !isRecording) {
             alert("Please answer this question !!")
             return;
         }

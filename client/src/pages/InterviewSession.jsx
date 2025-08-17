@@ -6,7 +6,7 @@ import InterviewContainer from "../components/InterviewContainer"
 const InterviewSession = () => {
   return (
     <>
-      <Navbar authenticated />
+      <Navbar />
       <InterviewContainer />
     </>
   )

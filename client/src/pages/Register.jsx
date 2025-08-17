@@ -1,16 +1,51 @@
 import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
 import { useForm } from 'react-hook-form'
+import axios, { formToJSON } from 'axios'
+import { useAuth } from '../authContext.jsx'
+import { useEffect } from "react"
+import { toast } from "react-toastify";
 
 const Register = () => {
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm({
     mode: "onChange"
   });
 
   const password = watch("password");
-  
+
+  useEffect(() => {
+      if (token) {
+        navigate('/interview');
+      }
+    }, [token, navigate]);
+
+  const onSubmit = async (data) => {
+    const { firstname , lastname , email, password } = data;
+
+    try {
+      const response = await axios.post('http://localhost:4000/api/auth/register', {firstname, lastname, email, password}, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (response.status === 201) {
+        toast.success("Account created successfully");
+        navigate('/login')
+      }
+      
+    }catch (error) {
+      if (error.response) {
+        toast.error(error.response.data.message || "Registration failed");
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
+  }
+
   return (
     <>
       <Navbar text="Login" buttonMessage="Already have an account?" onclick={() => navigate("/login")}  />
@@ -21,14 +56,12 @@ const Register = () => {
           <p className="text-3xl font-extralight">Start practicing interviews with AI</p>
         </div>
 
-        <form onSubmit={handleSubmit((data) => {
-          console.log(data);
-        })} className="w-sm flex flex-col gap-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="w-sm flex flex-col gap-2">
 
           {/* FirstName */}
           <div className="flex flex-col items-start w-full gap-0.5">
             <label htmlFor="Name">Firstname</label>
-            <input {...register("firstName", {
+            <input {...register("firstname", {
 
               required: "Firstname is required",
               maxLength: {
@@ -44,13 +77,13 @@ const Register = () => {
             }
               placeholder="Enter your firstname"
               className="px-4 py-2 rounded-md outline-gray-400 outline-1 w-full font-light text-sm" />
-            <p className="text-red-600 text-sm mt-1">{errors.firstName?.message}</p> {/* need optimization */}
+            <p className="text-red-600 text-sm mt-1">{errors.firstname?.message}</p> {/* need optimization */}
           </div>
 
           {/* LastName */}
           <div className="flex flex-col items-start w-full gap-0.5">
             <label htmlFor="Name">Lastname</label>
-            <input {...register("lastName", {
+            <input {...register("lastname", {
 
               required: "Lastname is required",
               maxLength: {
@@ -66,7 +99,7 @@ const Register = () => {
             }
               placeholder="Enter your lastname"
               className="px-4 py-2 rounded-md outline-gray-400 outline-1 w-full font-light text-sm" />
-            <p className="text-red-600 text-sm mt-1">{errors.lastName?.message}</p>
+            <p className="text-red-600 text-sm mt-1">{errors.lastname?.message}</p>
           </div>
 
           {/* Email */}
@@ -98,6 +131,10 @@ const Register = () => {
                 value: 6,
                 message: "Password must be at least 6 characters"
               },
+              maxLength: {
+                value: 30,
+                message: "Password must be less than 30 characters"
+              },
               pattern: {
                 value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).+$/,
                 message: "Password must include uppercase, lowercase, number, and symbol"
@@ -113,7 +150,7 @@ const Register = () => {
           {/* ConfirmPassword */}
           <div className="flex flex-col items-start w-full gap-0.5">
             <label htmlFor="Password" >Confirm password</label>
-            <input type="password" {...register("confirmPassword", {
+            <input type="password" {...register("confirmpassword", {
 
               required: "Please confirm your password",
               validate: (value) => value === password || "Passwords do not match"
@@ -122,7 +159,7 @@ const Register = () => {
             }
               placeholder="Confirm your password"
               className="px-4 py-2 rounded-md outline-gray-400 outline-1 w-full font-light text-sm" />
-            <p className="text-red-600 text-sm mt-1">{errors.confirmPassword?.message}</p>
+            <p className="text-red-600 text-sm mt-1">{errors.confirmpassword?.message}</p>
           </div>
 
           <button type="submit" className="bg-black text-white px-10 py-3 w-full rounded-md mt-2 outline-black cursor-pointer hover:bg-neutral-800">Create account</button>

@@ -3,12 +3,16 @@ import Button from './Button'
 import { LuBrain } from "react-icons/lu";
 import { PiUserCircleFill } from "react-icons/pi";
 import { useEffect, useState, useRef } from 'react';
-
+import { useAuth } from '../authContext.jsx';
 
 const Navbar = (props) => {
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
+
+    const { token, logout } = useAuth();
+
+    const isAuthenticated = Boolean(token)
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -38,7 +42,7 @@ const Navbar = (props) => {
                 <div className='flex w-full items-center justify-end gap-4'>
 
                     {/* If user is not authenticated */}
-                    {(!props.authenticated) &&
+                    {(!isAuthenticated) &&
                         (
                             <>
                                 <p className='hidden sm:flex font-light text-sm text-black/80'>{props.buttonMessage}</p>
@@ -47,7 +51,7 @@ const Navbar = (props) => {
                         )}
 
                     {/* If user is authenticated */}
-                    {props.authenticated &&
+                    {isAuthenticated &&
                         <div className='font-light text-sm text-black/80 flex flex-row items-center justify-end gap-4 '>
                             <Link to="/my-interviews" className='hidden sm:flex hover:text-black'>My Interviews</Link>
                             <Link to="/interview-history" className='hidden sm:flex hover:text-black'>Interview History</Link>
@@ -63,7 +67,7 @@ const Navbar = (props) => {
                                             <Link to={"/profile-settings"} className="hover:bg-gray-100 px-4 py-2 cursor-pointer">Profile Settings</Link>
                                             <Link to="/my-interviews" className='sm:hidden hover:bg-gray-100 px-4 py-2 cursor-pointer'>My Interviews</Link>
                                             <Link to="/interview-history" className='sm:hidden hover:bg-gray-100 px-4 py-2 cursor-pointer'>Interview History</Link>
-                                            <Link to={"/"} className="hover:bg-gray-100 px-4 py-2 cursor-pointer">Logout</Link>
+                                            <Link onClick={logout} className="hover:bg-gray-100 px-4 py-2 cursor-pointer">Logout</Link>
                                         </ul>
                                     </div>
                                 )}

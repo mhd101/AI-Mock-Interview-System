@@ -4,7 +4,7 @@ import InterviewCard from '../components/InterviewCard'
 const Interview = () => {
   return (
     <>
-        <Navbar authenticated /> 
+        <Navbar/> 
         <InterviewCard />
     </>
   )
