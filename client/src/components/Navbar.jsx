@@ -3,7 +3,7 @@ import Button from './Button'
 import { LuBrain } from "react-icons/lu";
 import { PiUserCircleFill } from "react-icons/pi";
 import { useEffect, useState, useRef } from 'react';
-import { useAuth } from '../authContext.jsx';
+import { useAuth } from '../context/authContext.jsx';
 
 const Navbar = (props) => {
     const navigate = useNavigate();

@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
 import { useForm } from 'react-hook-form'
 import axios from 'axios'
-import { useAuth } from '../authContext.jsx'
+import { useAuth } from '../context/authContext.jsx'
 import { useEffect } from "react"
 import { toast } from "react-toastify";
 
@@ -13,7 +13,7 @@ const Login = () => {
 
   useEffect(() => {
     if (token) {
-      navigate('/interview');
+      navigate('/');
     }
   }, [token, navigate]);
 

@@ -1,19 +1,42 @@
 import { useForm } from "react-hook-form"
 import { FaArrowRightLong } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const InterviewCard = () => {
     const navigate = useNavigate()
     const { register, handleSubmit, formState: { errors } } = useForm();
-    
+
+    // function to handle form submission
+    // It will fetch questions based on the selected category, level, and number of questions
+    // and then navigate to the interview session page with the fetched questions
+    // if there is an error while fetching questions, it will log the error to the console
     const handleStartInterview = (data) => {
-        if (data){
-            console.log(data)
+        if (data) {
+            console.log("Fetching questions from database...")
 
+            axios.get("http://127.0.0.1:5000/fetchQuestions", {
+                params: {
+                    technicalDomain: data.category,
+                    questionLevel: data.level,
+                    noOfQuestions: data.questionQuantity
+                }
+            }).then((response) => {
+                const question = response.data;
+                const updatedQuestions = question.map((q, index) => ({
+                    ...q,
+                    sequence_id: index + 1
+                }))
+                console.log("Fetched questions");
 
-
-            // used for routing and required for speech synthesis to work
-            navigate("/interview/session")
+                navigate("/interview/session", {
+                    state: {
+                        interviewQuestions: updatedQuestions
+                    }
+                });
+            }).catch((error) => {
+                console.error("Error fetching questions:", error);
+            });
         }
     }
 
@@ -52,7 +75,6 @@ const InterviewCard = () => {
                             <p className="text-red-600 text-sm mt-1">{errors.category?.message}</p>
                         </div>
 
-
                         <div className="flex flex-col items-start gap-0.5">
                             <label>Select Level:</label>
                             <p className="text-sm font-light text-black/70">Choose the difficulty level of questions</p>
@@ -70,13 +92,12 @@ const InterviewCard = () => {
                             <p className="text-sm font-light text-black/70">Choose no. of questions</p>
                             <select id="category" {...register("questionQuantity", { required: "This field is required" })} className="px-2 py-2 mt-1 rounded-md outline-gray-400 font-light text-sm outline-1 w-full ">
                                 <option value="" className="font-light">--Select--</option>
-                                <option value="three" className="font-light">3</option>
-                                <option value="five" className="font-light">5</option>
-                                <option value="ten" className="font-light">10</option>
+                                <option value="3" className="font-light">3</option>
+                                <option value="5" className="font-light">5</option>
+                                <option value="10" className="font-light">10</option>
                             </select>
                             <p className="text-red-600 text-sm mt-1">{errors.questionQuantity?.message}</p>
                         </div>
-
 
                         <button type="submit" className="w-full bg-black text-white px-10 py-4 rounded-md flex items-center gap-2 justify-center cursor-pointer mt-2">Generate Questions<FaArrowRightLong /></button>
                     </form>

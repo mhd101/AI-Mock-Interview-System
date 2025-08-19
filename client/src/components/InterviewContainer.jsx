@@ -2,7 +2,9 @@ import Transcribing from "./Transcribing"
 import { MdOutlineTipsAndUpdates } from "react-icons/md";
 import { useEffect, useState, useRef } from "react";
 import { HiMiniSpeakerWave } from "react-icons/hi2";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 
 const InterviewContainer = () => {
@@ -16,7 +18,16 @@ const InterviewContainer = () => {
     const [voiceReady, setVoiceReady] = useState(false)
     const [voice, setVoice] = useState(null)
     const navigate = useNavigate()
+    const location = useLocation();
+    const interview = location.state;
+    const { interviewQuestions } = interview || {};
+    const [answer, setAnswer] = useState({
+        ...interviewQuestions[currentQuestionIndex],
+        user_answer: "",
+    });
+    const [interviewData, setInterviewData] = useState([]); // Store interview data
 
+    // fucntion to load voices for speech synthesis
     const loadVoices = () => {
         return new Promise((resolve) => {
             let voices = speechSynthesis.getVoices();
@@ -31,6 +42,7 @@ const InterviewContainer = () => {
         });
     }
 
+    // function to speak text using the selected voice
     const speak = (text) => {
         if (!voice || !text) return;
         const utterance = new SpeechSynthesisUtterance(text)
@@ -42,7 +54,9 @@ const InterviewContainer = () => {
         speechSynthesis.speak(utterance)
     }
 
+    // load voices on component mount
     useEffect(() => {
+        console.log("Loading voices...");
         loadVoices().then((voices) => {
             const selected =
                 voices.find((v) => v.lang === 'en-GB' && !v.name.toLowerCase().includes('male')) ||
@@ -54,38 +68,42 @@ const InterviewContainer = () => {
         });
     }, []);
 
+    // speak welcome message to the user and first questino on component mount
     useEffect(() => {
+        console.log("Speaking welcome message and first question...");
+        
+        // check if voice is ready and questions are available
         if (!voiceReady || !voice || questions.length === 0) return;
 
         const welcome = `Welcome Mohammad, Let's begin your interview.`;
-        const question = `Question ${currentQuestionIndex + 1}: ${questions[currentQuestionIndex]}`;
+        const question = `Question ${currentQuestionIndex + 1}: ${questions[currentQuestionIndex]?.question}`;
 
-        setTimeout(speak(`${welcome} ${question}`), 500);
+        setTimeout(speak(`${welcome} ${question}`), 1000);
     }, [voiceReady, voice, questions]);
 
-    // Speak next question on index change
+    // speak the next question when the current question index changes
     useEffect(() => {
+        console.log("Speaking next question...");
         if (!voiceReady || !voice || currentQuestionIndex === 0) return;
-        const question = `Question ${currentQuestionIndex + 1}: ${questions[currentQuestionIndex]}`;
-        setTimeout(speak(question), 500);
+        const question = `Question ${currentQuestionIndex + 1}: ${questions[currentQuestionIndex]?.question}`;
+        setTimeout(speak(question), 1000);
     }, [currentQuestionIndex]);
 
+    // initialize speech recognition and set up event handlers
     useEffect(() => {
-        const fetchQuestions = async () => {
+        console.log("Initializing speech recognition...");
 
-            // mocking data
-            const data = [
-                "What is the difference between var, let, and const in javascript?",
-                "Explain event delegation in Javascript?",
-                "What is Closure?"
-            ]
-
-            setQuestions(data)
+        // check if interviewQuestions are available
+        if (!interviewQuestions || interviewQuestions.length === 0) {
+            toast.error("No questions available for this interview session.");
+            navigate("/interview");
+            return;
         }
-        fetchQuestions()
+
+        setQuestions(interviewQuestions || []);
 
         if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-            alert("You browser doesn't support Web Speech API")
+            toast.error("You browser doesn't support Web Speech API")
             return;
         }
 
@@ -100,7 +118,14 @@ const InterviewContainer = () => {
             for (let i = event.resultIndex; i < event.results.length; ++i) {
                 finalTranscript += event.results[i][0].transcript
             }
+
             setTranscript(finalTranscript)
+
+            // update the answer state with the final transcript
+            setAnswer(prev => ({
+                ...prev,
+                user_answer: finalTranscript
+            }))
 
             if (finalTranscript.trim()) {
                 setHasSpoken(true) // mark that the user has started speaking
@@ -114,7 +139,9 @@ const InterviewContainer = () => {
         recognitionRef.current = recognition
     }, [])
 
+    // handle recording state changes
     useEffect(() => {
+        console.log("Recording state changed: ", isRecording);
         const recognition = recognitionRef.current;
         if (!recognition) return;
 
@@ -127,26 +154,132 @@ const InterviewContainer = () => {
         }
     }, [isRecording])
 
+    // function to handle transcript changes: when the user edit the transcript manually
+    const handleTranscriptChange = (newTranscript) => {
+        setTranscript(newTranscript);
+        setAnswer(prev => ({
+            ...prev,
+            user_answer: newTranscript
+        }));
+    }
 
-    const handleNext = () => {
+    // function to handle next question 
+    const handleNext = async () => {
 
-        if(transcript === "" || !isRecording) {
-            alert("Please answer this question !!")
+        if (!hasSpoken || transcript.trim() === '') {
+            toast.error("Please answer this question !!")
             return;
         }
-        if (currentQuestionIndex < questions.length - 1) {
-            setTranscript('');
-            setCurrentQuestionIndex(prev => prev + 1)
+
+        if (isRecording) {
+            toast.error("Please stop recording before going to the next question.");
+            return;
         }
+
+        // reset the recording state if the current question is answered
+        if (currentQuestionIndex < questions.length - 1) {
+            setCurrentQuestionIndex(prev => prev + 1)
+
+            setTranscript('');
+            setHasSpoken(false); // reset for next question
+            setIsRecording(false); // reset recording state
+
+        }
+
+        // send the answer to the backend for feedback
+        try {
+            console.log("Sending answer to backend")
+            const response = await axios.post("http://127.0.0.1:5000/getFeedback", {
+                ...answer
+            })
+            console.log("Feedback received");
+
+            // store the answer in interviewData
+            console.log("Storing answer in interviewData");
+            setInterviewData(prevData => [
+                ...prevData,
+                {
+                    questionId: response.data.question_id,
+                    questionLevel: interviewQuestions[currentQuestionIndex]?.level,
+                    question: response.data.question,
+                    questionKeypoints: response.data.keypoints,
+                    userAnswer: response.data.user_answer,
+                    detectedKeypoints: response.data.detected_keypoints,
+                    missingKeypoints: response.data.missing_keypoints,
+                    feedback: response.data.feedback,
+                    rating: response.data.rating,
+                    rating_average: response.data.rating_average,
+
+                }
+            ])
+
+        } catch (error) {
+            console.error("Error sending answer to backend:", error);
+            toast.error("Failed to send answer to backend. Please try again later.");
+        }
+
+        // reset the answer state for the next question
+        console.log("Resetting answer for next question");
+        setAnswer({
+            ...interviewQuestions[currentQuestionIndex + 1],
+            user_answer: "",
+        });
+
     }
 
-    const handleSubmit = () => {
-        alert("Interview Submitted")
+    // function to handle interview submission
+    const handleSubmit = async () => {
+
+        // check if the user has spoken for the last question
+        if (!hasSpoken || transcript.trim() === '') {
+            toast.error("Please answer the last question !!")
+            return;
+        }
+
+        if (isRecording) {
+            toast.error("Please stop recording before submitting the interview.");
+            return;
+        }
+
+        // send the last answer to the backend for feedback
+        try {
+            console.log("Sending answer to backend")
+            const response = await axios.post("http://127.0.0.1:5000/getFeedback", {
+                ...answer
+            })
+            console.log("Feedback received");
+
+            // // store the answer in interviewData
+            console.log("Storing last answer in interviewData");
+            setInterviewData(prevData => [
+                ...prevData,
+                {
+                    questionId: response.data.question_id,
+                    questionCategory: interviewQuestions[currentQuestionIndex]?.question_category,
+                    questionLevel: interviewQuestions[currentQuestionIndex]?.question_level,
+                    question: response.data.question,
+                    questionKeypoints: response.data.keypoints,
+                    userAnswer: response.data.user_answer,
+                    detectedKeypoints: response.data.detected_keypoints,
+                    missingKeypoints: response.data.missing_keypoints,
+                    feedback: response.data.feedback,
+                    rating: response.data.rating,
+                    rating_average: response.data.rating_average,
+
+                }
+            ])
+
+            toast.success("Interview Submitted")
+
+        } catch (error) {
+            console.error("Error sending answer to backend:", error);
+            toast.error("Failed to send answer to backend. Please try again later.");
+        }
 
         navigate("/interview/session/result")
-        
     }
-
+    
+    console.log("Interview Data:", interviewData)
     return (
         <>
             <div className="flex flex-col items-center justify-center gap-5 max-w-[1024px] h-screen mx-auto mt-[-76px] px-2">
@@ -164,17 +297,21 @@ const InterviewContainer = () => {
                         <div className="flex flex-col justify-around items-start gap-3 w-full">
                             <div className="flex flex-col gap-1 w-full">
                                 <p className="font-medium">Question {currentQuestionIndex + 1}:</p>
-                                <p className="">{questions[currentQuestionIndex]}<HiMiniSpeakerWave onClick={() => speak(questions[currentQuestionIndex])} className="cursor-pointer" /></p>
+                                <p className="">{questions[currentQuestionIndex]?.question}<HiMiniSpeakerWave onClick={() => speak(questions[currentQuestionIndex]?.question)} className="cursor-pointer" /></p>
                             </div>
                             <div className="flex flex-col gap-1 w-full">
                                 <p className="font-medium">Transcribing:</p>
                                 <Transcribing
+                                    key={currentQuestionIndex}
+                                    isRecording={isRecording}
                                     speechText=
                                     {isRecording
                                         ? hasSpoken
                                             ? transcript || "Listening..."
                                             : "Listening..."
-                                        : (transcript || "")} />
+                                        : (transcript || "")}
+                                    onTranscriptChange={handleTranscriptChange}
+                                />
 
                             </div>
                             <div className="flex flex-col justify-between gap-2 bg-neutral-100/80 rounded-md px-3 py-3 outline-1 outline-gray-400/50">

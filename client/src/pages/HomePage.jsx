@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 const HomePage = () => {
     const navigate = useNavigate();
+    
     return (
         <>
             <Navbar text="Register" onclick={() => navigate("/register")} buttonMessage="Don't have an account?" />
