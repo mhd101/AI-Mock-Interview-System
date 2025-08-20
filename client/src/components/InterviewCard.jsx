@@ -2,26 +2,30 @@ import { useForm } from "react-hook-form"
 import { FaArrowRightLong } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../context/authContext";
+import { toast } from "react-toastify";
 
 const InterviewCard = () => {
     const navigate = useNavigate()
     const { register, handleSubmit, formState: { errors } } = useForm();
 
+    const { user } = useAuth()
+
     // function to handle form submission
     // It will fetch questions based on the selected category, level, and number of questions
     // and then navigate to the interview session page with the fetched questions
     // if there is an error while fetching questions, it will log the error to the console
-    const handleStartInterview = (data) => {
+    const handleStartInterview = async (data) => {
         if (data) {
             console.log("Fetching questions from database...")
 
-            axios.get("http://127.0.0.1:5000/fetchQuestions", {
+            await axios.get("http://127.0.0.1:5000/fetchQuestions", {
                 params: {
                     technicalDomain: data.category,
                     questionLevel: data.level,
                     noOfQuestions: data.questionQuantity
                 }
-            }).then((response) => {
+            }).then(async (response) => {
                 const question = response.data;
                 const updatedQuestions = question.map((q, index) => ({
                     ...q,
@@ -29,14 +33,39 @@ const InterviewCard = () => {
                 }))
                 console.log("Fetched questions");
 
+                // creating interview session
+
+                const res = await axios.post("http://localhost:4000/api/interview/create", {
+                    userId: user.id,
+                    interviewCategory: data.category,
+                    interviewLevel: data.level
+                }, {
+                    headers: {
+                        type: "application/json"
+                    }
+                })
+
+                if (res.status === 201) {
+                    console.log("Interview Session Created")
+                }
+
                 navigate("/interview/session", {
                     state: {
-                        interviewQuestions: updatedQuestions
+                        interviewPreferences: {
+                            category: data.category,
+                            level: data.level,
+                            questionQuantity: data.questionQuantity
+                        },
+                        interviewQuestions: updatedQuestions,
+                        interviewSessionId: res.data.interview._id
                     }
                 });
+
             }).catch((error) => {
                 console.error("Error fetching questions:", error);
             });
+
+
         }
     }
 
@@ -106,5 +135,6 @@ const InterviewCard = () => {
         </>
     )
 }
+
 
 export default InterviewCard

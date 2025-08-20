@@ -5,6 +5,7 @@ import { HiMiniSpeakerWave } from "react-icons/hi2";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/authContext.jsx";
 
 
 const InterviewContainer = () => {
@@ -20,12 +21,14 @@ const InterviewContainer = () => {
     const navigate = useNavigate()
     const location = useLocation();
     const interview = location.state;
-    const { interviewQuestions } = interview || {};
+    const { interviewQuestions, interviewPreferences, interviewSessionId } = interview || {};
+    const { category, level } = interviewPreferences || {};
     const [answer, setAnswer] = useState({
         ...interviewQuestions[currentQuestionIndex],
         user_answer: "",
     });
-    const [interviewData, setInterviewData] = useState([]); // Store interview data
+    // const [interviewData, setInterviewData] = useState([]); // Store interview data
+    const { user } = useAuth()
 
     // fucntion to load voices for speech synthesis
     const loadVoices = () => {
@@ -71,7 +74,7 @@ const InterviewContainer = () => {
     // speak welcome message to the user and first questino on component mount
     useEffect(() => {
         console.log("Speaking welcome message and first question...");
-        
+
         // check if voice is ready and questions are available
         if (!voiceReady || !voice || questions.length === 0) return;
 
@@ -196,22 +199,35 @@ const InterviewContainer = () => {
 
             // store the answer in interviewData
             console.log("Storing answer in interviewData");
-            setInterviewData(prevData => [
-                ...prevData,
-                {
-                    questionId: response.data.question_id,
-                    questionLevel: interviewQuestions[currentQuestionIndex]?.level,
-                    question: response.data.question,
-                    questionKeypoints: response.data.keypoints,
-                    userAnswer: response.data.user_answer,
-                    detectedKeypoints: response.data.detected_keypoints,
-                    missingKeypoints: response.data.missing_keypoints,
-                    feedback: response.data.feedback,
-                    rating: response.data.rating,
-                    rating_average: response.data.rating_average,
 
+            // saving the question answer in the interview session
+            
+            let interviewData = {
+                interviewId: interviewSessionId,
+                questionId: response.data.question_id,
+                question: response.data.question,
+                questionKeypoints: response.data.keypoints,
+                userAnswer: response.data.user_answer,
+                detectedKeypoints: response.data.detected_keypoints,
+                missingKeypoints: response.data.missing_keypoints,
+                feedback: response.data.feedback,
+                rating: response.data.rating,
+                rating_average: response.data.rating_average,
+
+            }
+
+
+            const res = await axios.post("http://localhost:4000/api/interview/add-question-answer", {
+                ...interviewData
+            }, {
+                headers: {
+                    type: "application/json"
                 }
-            ])
+            })
+
+            if(res.status === 201) {
+                console.log("Added question to the current interview session")
+            }
 
         } catch (error) {
             console.error("Error sending answer to backend:", error);
@@ -251,25 +267,50 @@ const InterviewContainer = () => {
 
             // // store the answer in interviewData
             console.log("Storing last answer in interviewData");
-            setInterviewData(prevData => [
-                ...prevData,
-                {
-                    questionId: response.data.question_id,
-                    questionCategory: interviewQuestions[currentQuestionIndex]?.question_category,
-                    questionLevel: interviewQuestions[currentQuestionIndex]?.question_level,
-                    question: response.data.question,
-                    questionKeypoints: response.data.keypoints,
-                    userAnswer: response.data.user_answer,
-                    detectedKeypoints: response.data.detected_keypoints,
-                    missingKeypoints: response.data.missing_keypoints,
-                    feedback: response.data.feedback,
-                    rating: response.data.rating,
-                    rating_average: response.data.rating_average,
+            // saving the question answer in the interview session
+            
+            let interviewData = {
+                interviewId: interviewSessionId,
+                questionId: response.data.question_id,
+                question: response.data.question,
+                questionKeypoints: response.data.keypoints,
+                userAnswer: response.data.user_answer,
+                detectedKeypoints: response.data.detected_keypoints,
+                missingKeypoints: response.data.missing_keypoints,
+                feedback: response.data.feedback,
+                rating: response.data.rating,
+                rating_average: response.data.rating_average,
 
+            }
+
+            const res = await axios.post("http://localhost:4000/api/interview/add-question-answer", {
+                ...interviewData
+            }, {
+                headers: {
+                    type: "application/json"
                 }
-            ])
+            })
+
+            if(res.status === 201) {
+                console.log("Added question to the current interview session")
+            }
 
             toast.success("Interview Submitted")
+
+            // update the status of interview status
+
+            const updateInterviewStatus = await axios.patch("http://localhost:4000/api/interview/update", {
+                interviewId: interviewSessionId,
+                interview_status: "completed"
+            }, {
+                headers: {
+                    type: "application/json"
+                }
+            })
+
+            if (updateInterviewStatus.status === 200) {
+                console.log("Updated the interview status to completed")
+            }
 
         } catch (error) {
             console.error("Error sending answer to backend:", error);
@@ -278,8 +319,7 @@ const InterviewContainer = () => {
 
         navigate("/interview/session/result")
     }
-    
-    console.log("Interview Data:", interviewData)
+
     return (
         <>
             <div className="flex flex-col items-center justify-center gap-5 max-w-[1024px] h-screen mx-auto mt-[-76px] px-2">
@@ -287,7 +327,7 @@ const InterviewContainer = () => {
                 <div className="flex flex-col gap-10 outline-1 outline-gray-400/50 rounded-md py-10 px-10 w-full">
                     {/* Heading */}
                     <div className="flex justify-between items-center">
-                        <h1 className="text-3xl font-semibold">JavaScript Mock Interview</h1>
+                        <h1 className="text-3xl font-semibold">{category.charAt(0).toUpperCase() + category.slice(1)} Mock Interview</h1>
                         <p className="text-right font-light text-sm text-black/60">Question {currentQuestionIndex + 1} of {questions.length} </p>
                     </div>
 
@@ -355,7 +395,6 @@ const InterviewContainer = () => {
                         </div>
 
                     </div>
-
                 </div>
             </div>
         </>

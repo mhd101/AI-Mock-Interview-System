@@ -4,6 +4,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { connectDB } from './config/dbConnection.js'
 import authRouter from './routes/authRoutes.js'
+import { interviewRouter } from './routes/interviewRoutes.js';
 
 
 // creating express server
@@ -27,6 +28,8 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/auth', authRouter)
+
+app.use('/api/interview', interviewRouter)
 
 app.listen(port, () => console.log(`Server is running on port ${port}`))
 
