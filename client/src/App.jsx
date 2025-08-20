@@ -13,6 +13,7 @@ import ProtectedRoute from './context/ProtectedRoute.jsx'
 import { ToastContainer, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import './toast.css'
+import ResultPage from './pages/ResultPage.jsx'
 
 const App = () => {
 
@@ -31,6 +32,11 @@ const App = () => {
         <Route path='/interview/session' element={
           <ProtectedRoute>
             <InterviewSession />
+          </ProtectedRoute>} />
+
+        <Route path='/interview/session/result/:id' element={
+          <ProtectedRoute>
+            <ResultPage />
           </ProtectedRoute>} />
 
         <Route path='/my-interviews' element={

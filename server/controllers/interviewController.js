@@ -2,6 +2,7 @@ import User from "../models/userModel.js";
 import Interview from "../models/interviewModel.js";
 import QuestionAnswer from "../models/questionAnswerModel.js";
 
+// function to create interview session based on user preference
 export const createInterview = async (req, res) => {
 
     const { userId, interviewCategory, interviewLevel } = req.body;
@@ -31,6 +32,7 @@ export const createInterview = async (req, res) => {
     }
 }
 
+// function to update the interview session like status
 export const updateInterview = async (req, res) => {
     const { interviewId, interview_status } = req.body
 
@@ -61,6 +63,63 @@ export const updateInterview = async (req, res) => {
     }
 }
 
+// function to get interview details by interview Id
+export const getInterviewById = async (req, res) => {
+    const { interviewId } = req.params
+
+    try {
+        const interview = await Interview.findById(interviewId)
+
+        if (!interview) {
+            return res.status(404).json({
+                success: false,
+                message: "Interview session not found"
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Interview session found",
+            interview
+        })
+    } catch (error) {
+        console.error("Error fetching interview", error)
+        return res.status(400).json({
+            success: false,
+            message: "Error fetching interview"
+        })
+    }
+}
+
+export const getAllInterviewsById = async (req, res) => {
+    const { userId } = req.params
+
+    try {
+
+        const interviews = await Interview.find({ user_id: userId }).sort({ createdAt: -1 })
+
+        if (!interviews || interviews.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No interview session found for this user"
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Interview session found for this user",
+            interviews
+        })
+    } catch (error) {
+        console.error("Error fetching interview", error)
+        return res.status(400).json({
+            success: false,
+            message: "Error fetching interview"
+        })
+    }
+}
+
+// function to add question-answers to the ongoing interview session
 export const addQuestionAnswer = async (req, res) => {
     const { interviewId, questionId, question, questionKeypoints, userAnswer, detectedKeypoints, missingKeypoints, feedback, rating, rating_average } = req.body;
 
@@ -113,5 +172,5 @@ export const addQuestionAnswer = async (req, res) => {
             message: "Server error"
         });
     }
-
 }
+

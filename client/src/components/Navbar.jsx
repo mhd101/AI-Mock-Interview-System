@@ -54,7 +54,7 @@ const Navbar = (props) => {
                     {isAuthenticated &&
                         <div className='font-light text-sm text-black/80 flex flex-row items-center justify-end gap-4 '>
                             <Link to="/my-interviews" className='hidden sm:flex hover:text-black'>My Interviews</Link>
-                            <Link to="/interview-history" className='hidden sm:flex hover:text-black'>Interview History</Link>
+                            {/* <Link to="/interview-history" className='hidden sm:flex hover:text-black'>Interview History</Link> */}
 
                             <div className='relative inline-block' ref={dropdownRef}>
                                 <button onClick={() => setIsOpen(!isOpen)} className='flex justify-center items-center'>

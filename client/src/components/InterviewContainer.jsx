@@ -2,7 +2,7 @@ import Transcribing from "./Transcribing"
 import { MdOutlineTipsAndUpdates } from "react-icons/md";
 import { useEffect, useState, useRef } from "react";
 import { HiMiniSpeakerWave } from "react-icons/hi2";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, replace } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/authContext.jsx";
@@ -78,7 +78,7 @@ const InterviewContainer = () => {
         // check if voice is ready and questions are available
         if (!voiceReady || !voice || questions.length === 0) return;
 
-        const welcome = `Welcome Mohammad, Let's begin your interview.`;
+        const welcome = `Welcome ${user.firstname}, Let's begin your interview.`;
         const question = `Question ${currentQuestionIndex + 1}: ${questions[currentQuestionIndex]?.question}`;
 
         setTimeout(speak(`${welcome} ${question}`), 1000);
@@ -317,7 +317,7 @@ const InterviewContainer = () => {
             toast.error("Failed to send answer to backend. Please try again later.");
         }
 
-        navigate("/interview/session/result")
+        navigate(`/interview/session/result/${interviewSessionId}`, {replace: true})
     }
 
     return (
