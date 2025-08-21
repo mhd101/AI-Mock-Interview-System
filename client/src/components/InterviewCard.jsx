@@ -38,7 +38,8 @@ const InterviewCard = () => {
                 const res = await axios.post("http://localhost:4000/api/interview/create", {
                     userId: user.id,
                     interviewCategory: data.category,
-                    interviewLevel: data.level
+                    interviewLevel: data.level,
+                    interviewStartTime: new Date()
                 }, {
                     headers: {
                         type: "application/json"

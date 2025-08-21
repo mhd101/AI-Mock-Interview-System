@@ -1,6 +1,9 @@
 import { BiDownload, BiShareAlt } from "react-icons/bi"
 
+
 const ResultCard = ({questionQuantity, duration, category, level, }) => {
+    
+
     return (
         <>
             <div className="flex flex-col justify-center items-center gap-10 outline-1 outline-gray-400/50 rounded-md py-10 px-10 w-full">

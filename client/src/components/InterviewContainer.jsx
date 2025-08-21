@@ -6,6 +6,7 @@ import { useNavigate, useLocation, replace } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/authContext.jsx";
+import FacialAnalysis from "./Facial Anaylsis.jsx";
 
 
 const InterviewContainer = () => {
@@ -29,6 +30,9 @@ const InterviewContainer = () => {
     });
     // const [interviewData, setInterviewData] = useState([]); // Store interview data
     const { user } = useAuth()
+
+    const [facialData, setFacialData] = useState(null)
+
 
     // fucntion to load voices for speech synthesis
     const loadVoices = () => {
@@ -71,7 +75,7 @@ const InterviewContainer = () => {
         });
     }, []);
 
-    // speak welcome message to the user and first questino on component mount
+    // speak welcome message to the user and first question on component mount
     useEffect(() => {
         console.log("Speaking welcome message and first question...");
 
@@ -201,7 +205,7 @@ const InterviewContainer = () => {
             console.log("Storing answer in interviewData");
 
             // saving the question answer in the interview session
-            
+
             let interviewData = {
                 interviewId: interviewSessionId,
                 questionId: response.data.question_id,
@@ -225,7 +229,7 @@ const InterviewContainer = () => {
                 }
             })
 
-            if(res.status === 201) {
+            if (res.status === 201) {
                 console.log("Added question to the current interview session")
             }
 
@@ -268,7 +272,7 @@ const InterviewContainer = () => {
             // // store the answer in interviewData
             console.log("Storing last answer in interviewData");
             // saving the question answer in the interview session
-            
+
             let interviewData = {
                 interviewId: interviewSessionId,
                 questionId: response.data.question_id,
@@ -284,14 +288,14 @@ const InterviewContainer = () => {
             }
 
             const res = await axios.post("http://localhost:4000/api/interview/add-question-answer", {
-                ...interviewData
+                ...interviewData,
             }, {
                 headers: {
                     type: "application/json"
                 }
             })
 
-            if(res.status === 201) {
+            if (res.status === 201) {
                 console.log("Added question to the current interview session")
             }
 
@@ -301,7 +305,8 @@ const InterviewContainer = () => {
 
             const updateInterviewStatus = await axios.patch("http://localhost:4000/api/interview/update", {
                 interviewId: interviewSessionId,
-                interview_status: "completed"
+                interview_status: "completed",
+                interviewEndTime: new Date()
             }, {
                 headers: {
                     type: "application/json"
@@ -317,8 +322,42 @@ const InterviewContainer = () => {
             toast.error("Failed to send answer to backend. Please try again later.");
         }
 
-        navigate(`/interview/session/result/${interviewSessionId}`, {replace: true})
+        console.log(stateCountRef)
+        navigate(`/interview/session/result/${interviewSessionId}`, { replace: true })
     }
+
+
+    const handleFacialAnaylsis = (data) => {
+        setFacialData(data)
+    }
+
+    // analyzing non-verbal state data
+
+    const stateCountRef = useRef({
+        eye: { "Looking Left": 0, "Looking Right": 0, "Looking Up": 0, "Looking Down": 0 },
+        head: { "Looking Left": 0, "Looking Right": 0, "Looking Up": 0, "Looking Down": 0, "Center": 0 },
+        mouth: { "Speaking": 0, "Silent": 0 }
+    });
+
+    const lastFacialStateRef = useRef({});
+
+    useEffect(() => {
+        if (!facialData) return
+
+        const lastState = lastFacialStateRef.current
+
+        for (const category of ["eye", "head", "mouth"]) {
+            const newState = facialData[category]
+            const prevState = lastState?.[category]
+
+            if (newState && newState !== prevState) {
+                stateCountRef.current[category][newState] += 1
+            }
+        }
+
+        lastFacialStateRef.current = facialData
+    }, [facialData])
+
 
     return (
         <>
@@ -368,12 +407,18 @@ const InterviewContainer = () => {
 
                         {/* Right Card */}
                         <div className=" flex flex-col justify-between gap-4 w-full ">
-                            <div className="flex justify-center items-center h-60 outline-1 rounded-md outline-gray-400/50 bg-neutral-100/80 text-black/80">
-                                Camera Preview
+                            <div className="outline-1 rounded-md outline-gray-400/50 bg-neutral-100/80 text-black/80 shadow-md">
+                                <FacialAnalysis onUpdate={handleFacialAnaylsis} />
                             </div>
 
-                            <div className="flex justify-center items-center h-30 outline-1 rounded-md outline-gray-400/50 bg-neutral-100/80 text-black/80">
-                                Real Time Feedback
+                            <div className="flex flex-col gap-2 justify-center items-center h-30 outline-1 rounded-md outline-gray-400/50 bg-neutral-100/80 text-black/80">
+                                <p className="text-black/70 text-md"><strong>Non-verbal Feedback</strong></p>
+
+                                <div>
+                                    <p className="text-black/70 text-sm"><strong>Eye Direction:</strong> {facialData?.eye}</p>
+                                    <p className="text-black/70 text-sm"><strong>Head Position:</strong> {facialData?.head}</p>
+                                    <p className="text-black/70 text-sm"><strong>Mouth State:</strong> {facialData?.mouth}</p>
+                                </div>
                             </div>
 
 

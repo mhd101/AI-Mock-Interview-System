@@ -5,7 +5,7 @@ import QuestionAnswer from "../models/questionAnswerModel.js";
 // function to create interview session based on user preference
 export const createInterview = async (req, res) => {
 
-    const { userId, interviewCategory, interviewLevel } = req.body;
+    const { userId, interviewCategory, interviewLevel, interviewStartTime } = req.body;
 
     try {
         const newInterview = new Interview({
@@ -13,7 +13,9 @@ export const createInterview = async (req, res) => {
             interview_category: interviewCategory,
             interview_level: interviewLevel,
             interview_data: [],
-            interview_status: 'inProgress'
+            interview_status: 'inProgress',
+            interviewStartTime: interviewStartTime,
+            interviewEndTime: interviewStartTime
         })
 
         await newInterview.save();
@@ -34,7 +36,7 @@ export const createInterview = async (req, res) => {
 
 // function to update the interview session like status
 export const updateInterview = async (req, res) => {
-    const { interviewId, interview_status } = req.body
+    const { interviewId, interview_status, interviewEndTime } = req.body
 
     if (!interviewId) {
         return res.status(400).json({
@@ -44,7 +46,7 @@ export const updateInterview = async (req, res) => {
     }
 
     try {
-        const interview = await Interview.findByIdAndUpdate(interviewId, { interview_status }, { new: true, runValidators: true })
+        const interview = await Interview.findByIdAndUpdate(interviewId, { interview_status, interviewEndTime }, { new: true, runValidators: true })
 
         if (!interview) {
             return res.status(404).json({ message: "Interview not found" });

@@ -13,8 +13,6 @@ const ResultPage = () => {
 
     const { id } = useParams()
 
-    console.log(id)
-
     useEffect(() => {
         if (!id) return;
 
@@ -38,11 +36,37 @@ const ResultPage = () => {
 
     }, [id])
 
+    // utility function
+    function formatDurationHuman(startTime, endTime) {
+        const durationMs = endTime - startTime;
+        const totalSeconds = Math.floor(durationMs / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+
+        let result = "";
+        if (minutes > 0) {
+            result += minutes === 1 ? "1 minute" : `${minutes} minutes`;
+        }
+        if (seconds > 0) {
+            if (minutes > 0) result += " and ";
+            result += seconds === 1 ? "1 second" : `${seconds} seconds`;
+        }
+        if (minutes === 0 && seconds === 0) {
+            result = "0 seconds";
+        }
+        return result;
+    }
+
+    const interviewStartTime = interviewData?.interview.interviewStartTime
+    const interviewEndTime = interviewData?.interview.interviewEndTime
+    const duration = formatDurationHuman(new Date(interviewStartTime), new Date(interviewEndTime))
+
+    // utility function
     const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
     return (
 
-        
+
         <>
             <Navbar />
 
@@ -52,7 +76,7 @@ const ResultPage = () => {
                     <p className='text-center font-light text-md text-black/70'>Below is a summary of your performance along with detailed feedback and recommendations.</p>
                 </div>
 
-                <ResultCard level={capitalize(interviewData?.interview.interview_level)} category={capitalize(interviewData?.interview.interview_category)} questionQuantity={interviewData?.interview.interview_data.length}/>
+                <ResultCard level={capitalize(interviewData?.interview.interview_level)} category={capitalize(interviewData?.interview.interview_category)} questionQuantity={interviewData?.interview.interview_data.length} duration={duration} />
 
                 <div className='w-full flex flex-col justify-center items-center gap-5'>
                     <div className='flex flex-col gap-2 justify-center items-center'>

@@ -24,6 +24,12 @@ const interviewSchema = new mongoose.Schema({
         type: String,
         enum: ['inProgress','completed', 'cancelled'],
         default: 'inProgress'
+    },
+    interviewStartTime: {
+        type: Date
+    },
+    interviewEndTime: {
+        type: Date
     }
 }, {
     timestamps: true    
