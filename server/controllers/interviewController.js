@@ -36,7 +36,7 @@ export const createInterview = async (req, res) => {
 
 // function to update the interview session like status
 export const updateInterview = async (req, res) => {
-    const { interviewId, interview_status, interviewEndTime } = req.body
+    const { interviewId, interview_status, interviewEndTime, facialAnaylsis, overallScore } = req.body
 
     if (!interviewId) {
         return res.status(400).json({
@@ -46,7 +46,7 @@ export const updateInterview = async (req, res) => {
     }
 
     try {
-        const interview = await Interview.findByIdAndUpdate(interviewId, { interview_status, interviewEndTime }, { new: true, runValidators: true })
+        const interview = await Interview.findByIdAndUpdate(interviewId, { interview_status, interviewEndTime, facialAnaylsis, overallScore }, { new: true, runValidators: true })
 
         if (!interview) {
             return res.status(404).json({ message: "Interview not found" });

@@ -301,12 +301,26 @@ const InterviewContainer = () => {
 
             toast.success("Interview Submitted")
 
+            // adding nonverbal feedback
+            console.log("Computing Non Verbal Metrics");
+            const nonVerbalMetrics = computeMetrics(stateCountRef.current, metrics)
+            console.log("Getting Feedback on Non Verbal Metrics");
+            const nonVerbalResponse = await axios.post("http://127.0.0.1:5000/getFacialFeedback", {nonVerbalMetrics}, {
+                headers: "application/json"
+            } )
+
+            if(nonVerbalResponse.status === 200){
+                console.log("Non Verbal Feedback Data Generated")
+                console.log(nonVerbalResponse.data)
+            }
+
             // update the status of interview status
 
             const updateInterviewStatus = await axios.patch("http://localhost:4000/api/interview/update", {
                 interviewId: interviewSessionId,
                 interview_status: "completed",
-                interviewEndTime: new Date()
+                interviewEndTime: new Date(),
+                facialAnaylsis: nonVerbalResponse?.data
             }, {
                 headers: {
                     type: "application/json"
@@ -322,7 +336,6 @@ const InterviewContainer = () => {
             toast.error("Failed to send answer to backend. Please try again later.");
         }
 
-        console.log(stateCountRef)
         navigate(`/interview/session/result/${interviewSessionId}`, { replace: true })
     }
 
@@ -339,6 +352,12 @@ const InterviewContainer = () => {
         mouth: { "Speaking": 0, "Silent": 0 }
     });
 
+    const allowedStates = {
+        eye: ["Looking Left", "Looking Right", "Looking Up", "Looking Down"],
+        head: ["Looking Left", "Looking Right", "Looking Up", "Looking Down", "Center"],
+        mouth: ["Speaking", "Silent"]
+    };
+
     const lastFacialStateRef = useRef({});
 
     useEffect(() => {
@@ -350,13 +369,67 @@ const InterviewContainer = () => {
             const newState = facialData[category]
             const prevState = lastState?.[category]
 
-            if (newState && newState !== prevState) {
-                stateCountRef.current[category][newState] += 1
+            if (newState && newState !== prevState && allowedStates[category]?.includes(newState)) {
+                stateCountRef.current[category][newState] += 1;
             }
         }
 
         lastFacialStateRef.current = facialData
     }, [facialData])
+
+    // Define categories with rules
+    const metrics = {
+        Distracted: {
+            eye: ["Looking Left", "Looking Right"],
+            head: ["Looking Left", "Looking Right"]
+        },
+        Confident: {
+            eye: ["Looking Up"],
+            head: ["Center"],
+            mouth: ["Speaking"]
+        },
+        Nervous: {
+            eye: ["Looking Down"],
+            head: ["Looking Down"],
+            mouth: ["Silent"]
+        }
+    };
+
+    // Function to compute percentages
+    function computeMetrics(stateCounts, metrics) {
+        const results = {};
+        let total = 0;
+
+        // Calculate total counts across all categories
+        Object.values(stateCounts).forEach(category => {
+            total += Object.values(category).reduce((a, b) => a + b, 0);
+        });
+
+        // Calculate contribution for each metric
+        for (const [label, rules] of Object.entries(metrics)) {
+            let score = 0;
+            const usedMetrics = [];
+
+            for (const [category, states] of Object.entries(rules)) {
+                states.forEach(state => {
+                    if (stateCounts[category]?.[state] !== undefined) {
+                        score += stateCounts[category][state];
+                        usedMetrics.push(`${category}: ${state} (${stateCounts[category][state]})`);
+                    }
+                });
+            }
+
+            results[label] = {
+                percentage: ((score / total) * 100).toFixed(2) + "%",
+                metricsUsed: usedMetrics
+            };
+        }
+
+        return results;
+    }
+
+    // Run the function
+
 
 
     return (

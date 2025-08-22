@@ -30,6 +30,12 @@ const interviewSchema = new mongoose.Schema({
     },
     interviewEndTime: {
         type: Date
+    },
+    facialAnaylsis: {
+        type: Object
+    },
+    overallScore: {
+        type: Number
     }
 }, {
     timestamps: true    

@@ -41,7 +41,7 @@ const questionAnswerSchema = new mongoose.Schema({
     rating_average: {
         type: Number,
         min: 0,
-        max: 5,
+        max: 10,
     },
 }, { _id: false }); // prevent auto _id for each subdocument
 

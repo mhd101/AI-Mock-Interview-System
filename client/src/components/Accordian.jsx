@@ -7,9 +7,6 @@ const Accordian = ({ data }) => {
     const toggleAccordian = (index) => {
         setOpenIndex(openIndex === index ? null : index);
     };
-
-    console.log("data", data);
-
     return (
         <div className="w-full flex flex-col gap-2">
             {Array.isArray(data) &&

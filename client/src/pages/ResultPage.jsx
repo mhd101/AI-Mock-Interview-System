@@ -5,11 +5,13 @@ import ResultCard from '../components/ResultCard'
 import axios from 'axios'
 import { useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import FeedbackAccordian from '../components/FeedbackAccordian'
 
 
 const ResultPage = () => {
 
     const [interviewData, setInterviewData] = useState(null)
+    const [isScoreUpdated, setIsScoreUpdated] = useState(false);
 
     const { id } = useParams()
 
@@ -64,9 +66,47 @@ const ResultPage = () => {
     // utility function
     const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
+    const computeOverallScore = (interviewData) => {
+        const interviewAvgRating = interviewData?.interview_data.reduce((sum, i) => sum + i.rating_average, 0) / interviewData?.interview_data.length;
+
+        const overallScore = interviewData?.facialAnaylsis.nonVerbalScore + interviewAvgRating.toFixed(2) / 2
+
+
+        return Number(overallScore.toFixed(1))
+    }
+
+    const score = computeOverallScore(interviewData?.interview)
+
+    useEffect(() => {
+
+        if (!score || isScoreUpdated) return; // skip if score is null/undefined
+
+        // update the interview session data
+        const updateScore = async () => {
+            try {
+                const updateInterviewStatus = await axios.patch("http://localhost:4000/api/interview/update", {
+                    interviewId: id,
+                    overallScore: score
+                }, {
+                    headers: {
+                        type: "application/json"
+                    }
+                })
+
+                if (updateInterviewStatus.status === 200) {
+                    console.log("Updated overallScore")
+                    setIsScoreUpdated(true)
+                }
+            } catch (error) {
+                console.error("Error updating overallScore", error)
+                toast.error("Error updating overallScore")
+
+            }
+        }
+        updateScore()
+    }, [id, score,isScoreUpdated])
+
     return (
-
-
         <>
             <Navbar />
 
@@ -76,7 +116,7 @@ const ResultPage = () => {
                     <p className='text-center font-light text-md text-black/70'>Below is a summary of your performance along with detailed feedback and recommendations.</p>
                 </div>
 
-                <ResultCard level={capitalize(interviewData?.interview.interview_level)} category={capitalize(interviewData?.interview.interview_category)} questionQuantity={interviewData?.interview.interview_data.length} duration={duration} />
+                <ResultCard level={capitalize(interviewData?.interview.interview_level)} category={capitalize(interviewData?.interview.interview_category)} questionQuantity={interviewData?.interview.interview_data.length} duration={duration} score={interviewData?.interview.overallScore} />
 
                 <div className='w-full flex flex-col justify-center items-center gap-5'>
                     <div className='flex flex-col gap-2 justify-center items-center'>
@@ -91,6 +131,7 @@ const ResultPage = () => {
                         <h1 className='text-3xl font-semibold'>Non-Verbal Feedback</h1>
                         <p className='text-center font-light text-md text-black/70'>You can check your non-verbal feedback throughout the interview </p>
                     </div>
+                    <FeedbackAccordian data={interviewData?.interview.facialAnaylsis} />
                 </div>
 
             </div>
