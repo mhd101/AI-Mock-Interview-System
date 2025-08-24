@@ -72,7 +72,6 @@ const ResultPage = () => {
 
         const overallScore = interviewData?.facialAnaylsis.nonVerbalScore + interviewAvgRating.toFixed(2) / 2
 
-
         return Number(overallScore.toFixed(1))
     }
 

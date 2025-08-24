@@ -34,7 +34,6 @@ const InterviewCard = () => {
                 console.log("Fetched questions");
 
                 // creating interview session
-
                 const res = await axios.post("http://localhost:4000/api/interview/create", {
                     userId: user.id,
                     interviewCategory: data.category,
@@ -73,7 +72,7 @@ const InterviewCard = () => {
 
     // utility function
     function generateShareToken() {
-        const array = new Uint8Array(16); // 16 bytes = 128 bits
+        const array = new Uint8Array(16); 
         crypto.getRandomValues(array);
         return Array.from(array, b => b.toString(16).padStart(2, "0")).join("");
     }

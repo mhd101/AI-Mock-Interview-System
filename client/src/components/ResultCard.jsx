@@ -1,5 +1,4 @@
-import { BiDownload, BiShareAlt } from "react-icons/bi"
-
+import { BiDownload } from "react-icons/bi"
 
 const ResultCard = ({questionQuantity, duration, category, level, score, handleDownload }) => {
 

@@ -13,7 +13,7 @@ const FacialAnalysis = ({ onUpdate }) => {
   let backoff = useRef(500);
   const maxBackoff = 10000;
 
-  /** Start webcam */
+  // starting camera
   useEffect(() => {
     async function startCamera() {
       try {
@@ -42,10 +42,9 @@ const FacialAnalysis = ({ onUpdate }) => {
       stopSending();
       if (wsRef.current) wsRef.current.close();
     };
-    // eslint-disable-next-line
   }, []);
 
-  /** WebSocket connection */
+  // websocket connection
   const connectWebSocket = () => {
     if (
       wsRef.current &&
@@ -86,7 +85,7 @@ const FacialAnalysis = ({ onUpdate }) => {
     };
   };
 
-  /** Reconnect with backoff */
+  // reconnect with backoff
   const scheduleReconnect = () => {
     if (reconnectTimerRef.current) return;
     reconnectTimerRef.current = setTimeout(() => {
@@ -96,13 +95,13 @@ const FacialAnalysis = ({ onUpdate }) => {
     }, backoff.current);
   };
 
-  /** Start sending frames */
+  // start sending webcam frames 
   const startSending = () => {
     stopSending();
     sendTimerRef.current = setInterval(sendFrameIfReady, interval);
   };
 
-  /** Stop sending */
+  // stop sending webcam frames
   const stopSending = () => {
     if (sendTimerRef.current) {
       clearInterval(sendTimerRef.current);
@@ -110,7 +109,7 @@ const FacialAnalysis = ({ onUpdate }) => {
     }
   };
 
-  /** Send frame */
+  // send frame using websocket
   const sendFrameIfReady = () => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
     if (!videoRef.current || videoRef.current.readyState < videoRef.current.HAVE_ENOUGH_DATA) return;

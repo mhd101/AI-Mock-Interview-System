@@ -33,7 +33,7 @@ const InterviewContainer = () => {
 
     const [facialData, setFacialData] = useState(null)
 
-    // fucntion to load voices for speech synthesis
+    // function to load voices for speech synthesis
     const loadVoices = () => {
         return new Promise((resolve) => {
             let voices = speechSynthesis.getVoices();
@@ -204,7 +204,6 @@ const InterviewContainer = () => {
             console.log("Storing answer in interviewData");
 
             // saving the question answer in the interview session
-
             let interviewData = {
                 interviewId: interviewSessionId,
                 questionId: response.data.question_id,
@@ -314,7 +313,6 @@ const InterviewContainer = () => {
             }
 
             // update the status of interview status
-
             const updateInterviewStatus = await axios.patch("http://localhost:4000/api/interview/update", {
                 interviewId: interviewSessionId,
                 interview_status: "completed",
@@ -344,7 +342,6 @@ const InterviewContainer = () => {
     }
 
     // analyzing non-verbal state data
-
     const stateCountRef = useRef({
         eye: { "Looking Left": 0, "Looking Right": 0, "Looking Up": 0, "Looking Down": 0 },
         head: { "Looking Left": 0, "Looking Right": 0, "Looking Up": 0, "Looking Down": 0, "Center": 0 },
@@ -427,8 +424,6 @@ const InterviewContainer = () => {
         return results;
     }
 
-
-
     return (
         <>
             <div className="flex flex-col items-center justify-center gap-5 max-w-[1024px] h-screen mx-auto mt-[-76px] px-2">
@@ -503,9 +498,7 @@ const InterviewContainer = () => {
                                         <button className="bg-black text-white px-8 py-2 rounded-md cursor-pointer" onClick={() => setIsRecording(prev => !prev)}>{isRecording ? "Stop" : "Record"}</button>
                                         <button className="bg-black text-white px-8 py-2 rounded-md cursor-pointer" onClick={handleSubmit}>Submit</button>
                                     </>
-
                                 )}
-
                             </div>
                         </div>
 
