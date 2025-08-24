@@ -25,14 +25,13 @@ const InterviewContainer = () => {
     const { interviewQuestions, interviewPreferences, interviewSessionId } = interview || {};
     const { category, level } = interviewPreferences || {};
     const [answer, setAnswer] = useState({
-        ...interviewQuestions[currentQuestionIndex],
+        ...interviewQuestions?.[currentQuestionIndex],
         user_answer: "",
     });
     // const [interviewData, setInterviewData] = useState([]); // Store interview data
     const { user } = useAuth()
 
     const [facialData, setFacialData] = useState(null)
-
 
     // fucntion to load voices for speech synthesis
     const loadVoices = () => {
@@ -428,8 +427,6 @@ const InterviewContainer = () => {
         return results;
     }
 
-    // Run the function
-
 
 
     return (
@@ -439,7 +436,7 @@ const InterviewContainer = () => {
                 <div className="flex flex-col gap-10 outline-1 outline-gray-400/50 rounded-md py-10 px-10 w-full">
                     {/* Heading */}
                     <div className="flex justify-between items-center">
-                        <h1 className="text-3xl font-semibold">{category.charAt(0).toUpperCase() + category.slice(1)} Mock Interview</h1>
+                        <h1 className="text-3xl font-semibold">{category?.charAt(0).toUpperCase() + category?.slice(1)} Mock Interview</h1>
                         <p className="text-right font-light text-sm text-black/60">Question {currentQuestionIndex + 1} of {questions.length} </p>
                     </div>
 

@@ -65,7 +65,7 @@ export const updateInterview = async (req, res) => {
     }
 }
 
-// function to get interview details by interview Id
+// function to get interview session by interview Id
 export const getInterviewById = async (req, res) => {
     const { interviewId } = req.params
 
@@ -93,12 +93,40 @@ export const getInterviewById = async (req, res) => {
     }
 }
 
+// function to delete interview session by interview Id
+export const deleteInterviewById = async (req, res) => {
+    const { interviewId } = req.params
+
+    try {
+        const interview = await Interview.findByIdAndDelete(interviewId)
+
+        if (!interview) {
+            return res.status(404).json({
+                success: false,
+                message: "Interview session not found"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Successfully deleted interview session"
+        })
+    } catch (error) {
+        console.error("Error Delete interview session", error)
+        return res.status(400).json({
+            success: false,
+            message: "Error fetching interview session"
+        })
+    }
+}
+
+// function to get all interview session by userId
 export const getAllInterviewsById = async (req, res) => {
     const { userId } = req.params
 
     try {
 
-        const interviews = await Interview.find({ user_id: userId }).sort({ createdAt: -1 })
+        const interviews = await (await Interview.find({ user_id: userId, interview_status: "completed" }).sort({ createdAt: -1 }))
 
         if (!interviews || interviews.length === 0) {
             return res.status(404).json({

@@ -8,7 +8,7 @@ const ResultCard = ({questionQuantity, duration, category, level, score }) => {
             <div className="flex flex-col justify-center items-center gap-10 outline-1 outline-gray-400/50 rounded-md py-10 px-10 w-full">
                 <div className="flex flex-col justify-center items-center">
                     <h1 className="text-2xl font-light">Overall Score</h1>
-                    <p className="text-4xl font-medium">{score}</p> 
+                    <p className="text-4xl font-medium">{score?.toFixed(1)}</p> 
                     <p className="font-light">out of 10</p>
                 </div>
 

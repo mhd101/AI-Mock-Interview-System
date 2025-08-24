@@ -116,7 +116,7 @@ const ResultPage = () => {
                     <p className='text-center font-light text-md text-black/70'>Below is a summary of your performance along with detailed feedback and recommendations.</p>
                 </div>
 
-                <ResultCard level={capitalize(interviewData?.interview.interview_level)} category={capitalize(interviewData?.interview.interview_category)} questionQuantity={interviewData?.interview.interview_data.length} duration={duration} score={interviewData?.interview.overallScore} />
+                <ResultCard level={capitalize(interviewData?.interview.interview_level)} category={capitalize(interviewData?.interview.interview_category)} questionQuantity={interviewData?.interview.interview_data.length} duration={duration} score={interviewData?.interview.overallScore || score} />
 
                 <div className='w-full flex flex-col justify-center items-center gap-5'>
                     <div className='flex flex-col gap-2 justify-center items-center'>
