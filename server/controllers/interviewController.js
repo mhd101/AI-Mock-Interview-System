@@ -5,7 +5,7 @@ import QuestionAnswer from "../models/questionAnswerModel.js";
 // function to create interview session based on user preference
 export const createInterview = async (req, res) => {
 
-    const { userId, interviewCategory, interviewLevel, interviewStartTime } = req.body;
+    const { userId, interviewCategory, interviewLevel, interviewStartTime, shareToken } = req.body;
 
     try {
         const newInterview = new Interview({
@@ -15,7 +15,8 @@ export const createInterview = async (req, res) => {
             interview_data: [],
             interview_status: 'inProgress',
             interviewStartTime: interviewStartTime,
-            interviewEndTime: interviewStartTime
+            interviewEndTime: interviewStartTime,
+            shareToken: shareToken
         })
 
         await newInterview.save();
@@ -91,6 +92,35 @@ export const getInterviewById = async (req, res) => {
             message: "Error fetching interview"
         })
     }
+}
+
+// function to get interview session by shareToken
+export const getInterviewByShareToken = async (req, res) => {
+    const { shareToken } = req.params
+
+    try {
+        const interview = await Interview.findById(shareToken)
+
+        if (!interview) {
+            return res.status(404).json({
+                success: false,
+                message: "Interview session not found"
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Interview session found",
+            interview
+        })
+    } catch (error) {
+        console.error("Error fetching interview", error)
+        return res.status(400).json({
+            success: false,
+            message: "Error fetching interview"
+        })
+    }
+
 }
 
 // function to delete interview session by interview Id

@@ -1,7 +1,7 @@
 import { BiDownload, BiShareAlt } from "react-icons/bi"
 
 
-const ResultCard = ({questionQuantity, duration, category, level, score }) => {
+const ResultCard = ({questionQuantity, duration, category, level, score, handleDownload }) => {
 
     return (
         <>
@@ -32,8 +32,8 @@ const ResultCard = ({questionQuantity, duration, category, level, score }) => {
                 </div>
 
                 <div className="flex gap-2">
-                    <button className=" bg-black text-white px-6 py-2 rounded-md flex items-center gap-2 justify-center cursor-pointer text-md">Download Report<BiDownload /></button>
-                    <button  className=" bg-black text-white px-6 py-2 rounded-md flex items-center gap-2 justify-center cursor-pointer text-md">Share<BiShareAlt/></button>
+                    <button className=" bg-black text-white px-6 py-2 rounded-md flex items-center gap-2 justify-center cursor-pointer text-md" onClick={handleDownload}>Download Report<BiDownload /></button>
+                    {/* <button  className=" bg-black text-white px-6 py-2 rounded-md flex items-center gap-2 justify-center cursor-pointer text-md">Share<BiShareAlt/></button> */}
                 </div>
             </div>
         </>

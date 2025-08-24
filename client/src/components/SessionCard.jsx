@@ -55,7 +55,7 @@ const SessionCard = ({ data, setData }) => {
                 {Array.isArray(data?.interviews) && data?.interviews.length > 0 ? (
                     data.interviews.map((interview, index) => {
                         return (
-                            <div key={interview._id || index} className="flex justify-between items-center outline-1 outline-gray-400/50 rounded-md py-10 px-10 w-full cursor-pointer">
+                            <div key={interview._id || index} className="flex justify-between items-center outline-1 outline-gray-400/50 rounded-md py-10 px-10 w-full">
                                 <div className="flex flex-col gap-1">
                                     <strong className="text-2xl ">{capitalize(interview.interview_category)} Mock Interview</strong>
                                     <div className="flex gap-4 justify-start items-center text-black/80">

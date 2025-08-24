@@ -118,6 +118,7 @@ const FacialAnalysis = ({ onUpdate }) => {
     try {
       const canvas = captureCanvasRef.current;
       const ctx = canvas.getContext("2d");
+
       ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
       const dataUrl = canvas.toDataURL("image/jpeg", 0.6);
       wsRef.current.send(dataUrl);

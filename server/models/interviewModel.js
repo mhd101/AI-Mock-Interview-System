@@ -36,6 +36,10 @@ const interviewSchema = new mongoose.Schema({
     },
     overallScore: {
         type: Number
+    },
+    shareToken: {
+        type: String,
+        unique: true
     }
 }, {
     timestamps: true    
